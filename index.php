@@ -39,7 +39,7 @@ foreach ($menuitems as $menuitem)
 echo '<br/>';
 echo $homepage_content;
 echo '<hr/>';
-echo $footerhtmcode;
+echo $footerhtmlcode;
 ?>
 
 </body>
