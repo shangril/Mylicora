@@ -335,14 +335,14 @@ if (microtime(true)>=$expire&&(!file_exists('../d/lock.txt'))){
 				
 				$albz=array();
 				
-				foreach ($mediatierswhitelists[$apiurl] as $art){
+				foreach ($mediatierswhitelists[$apiurl]['whitelist'] as $art){
 				
 				//first, query for a list of album by this particular artist
 						$albz = array_merge($albz, explode("\n", file_get_contents($apiurl.'?listalbums='.urlencode(htmlentities($art)))));
 					
 					}
 				//then, remove the blacklisted albums if any
-					$blacklist=$mediatiersblacklists[$apiurl];
+					$blacklist=$mediatiersblacklists[$apiurl]['blacklist'];
 					$finalz=array_diff($albz, $blacklist);
 				//then, for each album, query the api for the list of tracks
 					foreach ($finalz as $queryme){

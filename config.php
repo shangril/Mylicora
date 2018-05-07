@@ -389,7 +389,7 @@ if (file_exists('./d/MediaTiersWhitelist.txt')){
 				$p++;
 				}
 			$socialone['whitelist']	= $whitelisted;
-			array_push ($mediatierswhitelists, $socialone);
+			$mediatiersblacklists[$socialone['url']]=$socialone;
 		}
 	}
 }
@@ -413,8 +413,8 @@ if (file_exists('./d/MediaTiersAlbumBlacklist.txt')){
 				array_push($whitelisted, $soctokens[$p]);
 				$p++;
 				}
-			$socialone['whitelist']	= $whitelisted;
-			array_push ($mediatiersblacklists, $socialone);
+			$socialone['blacklist']	= $whitelisted;
+			$mediatiersblacklists[$socialone['url']]=$socialone;
 		}
 	}
 }
