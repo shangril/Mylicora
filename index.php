@@ -24,7 +24,7 @@ require_once('./crero-lib.php');
 		<?php echo $description;?>
 	</h2>
 <?php
-$menuitems = array_keys($mainmenu)
+$menuitems = array_keys($mainmenu);
 
 foreach ($menuitems as $menuitem)
 {
@@ -32,7 +32,13 @@ foreach ($menuitems as $menuitem)
 	
 	$target = $mainmenu[$menuitem];
 	
-	echo '<a href="'.$target.'" class="mainmenubutton">'.htmlspecialchars($title).'</a>';
+	echo '<a href="'.$target.'" class="mainmenubutton" onclick="this.style.border='."'solid red 2px;'".'"
+	
+	';
+	if ($basename($target)==$olddir){
+		echo 'style="border:solid yellow 2px;"';
+		}
+	echo '>'.htmlspecialchars($title).'</a>';
 	
 }
 
