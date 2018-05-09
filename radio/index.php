@@ -48,19 +48,28 @@ if (isset($_GET['ajax'])){
 		}
 		
 		echo '<strong style="font-size:125%;">';
-		echo '<a target="new" href="../?artist='.urlencode(file_get_contents('./d/nowplayingartist.txt')).'">';
+		//echo '<a target="new" href="../?artist='.urlencode(file_get_contents('./d/nowplayingartist.txt')).'">';
 		echo file_get_contents('./d/nowplayingartist.txt');
-		echo '</a>';
+		//echo '</a>';
 		echo '</strong>';
 		echo ' - ';
-		echo '<a target="new" href="../?album='.urlencode(file_get_contents('./d/nowplayingalbum.txt')).'&track='.urlencode(file_get_contents('./d/nowplayingtitle.txt')).'">';
+		//echo '<a target="new" href="../?album='.urlencode(file_get_contents('./d/nowplayingalbum.txt')).'&track='.urlencode(file_get_contents('./d/nowplayingtitle.txt')).'">';
 		echo '<em style="font-size:125%;">'.file_get_contents('./d/nowplayingtitle.txt').'</em>';
-		echo '</a>';
+		//echo '</a>';
 		echo ' - ['.htmlspecialchars($hasplayedminutes).':'.htmlspecialchars($hasplayedseconds).'/'.htmlspecialchars($nowplayingdurationminutes).':'.htmlspecialchars($nowplayingdurationseconds).']';
+		if ($hasplayedminutes+0.01*$hasplayedseconds>$nowplayingdurationminutes+0.01*$nowplayingdurationseconds){
+			?>
+			
+			<script>
+			document.getElementById('player').src='./stream.mp3'+'?web=web&math='+Math.random();
+			</script>
+			
+			<?php
+		}
 		echo '<br/><span  style="font-size:125%;">(';
-		echo '<a target="new" href="../?album='.urlencode(file_get_contents('./d/nowplayingalbum.txt')).'">';
+		//echo '<a target="new" href="../?album='.urlencode(file_get_contents('./d/nowplayingalbum.txt')).'">';
 		echo file_get_contents('./d/nowplayingalbum.txt');
-		echo '</a>';
+		//echo '</a>';
 		
 		echo ')</span><br/>';
 		if (boolval(trim(file_get_contents('./d/nowplayingisfeatured.txt')))){
@@ -72,7 +81,7 @@ if (isset($_GET['ajax'])){
 			echo '<br/>'.file_get_contents('./d/license.txt');
 		}
 		else {
-			echo 'Exclusive premiere track. Out for download soon';
+			echo ' ';
 		}
 		if (!in_array(trim(html_entity_decode(file_get_contents('./d/nowplayingalbum.txt'))),$material_blacklist)
 			&&
@@ -81,7 +90,7 @@ if (isset($_GET['ajax'])){
 		
 		
 		) {
-			echo '<br/>Available as <a target="new" href="../?listall=mixed&album='.urlencode(file_get_contents('./d/nowplayingalbum.txt')).'">material release</a> at our online shop';
+			//echo '<br/>Available as <a target="new" href="../?listall=mixed&album='.urlencode(file_get_contents('./d/nowplayingalbum.txt')).'">material release</a> at our online shop';
 			
 		}
 		if (!file_exists('./d/maxlisteners.txt')){
@@ -104,7 +113,7 @@ if (isset($_GET['ajax'])){
 		$peaktime=microtime(true)-filectime('./d/maxlisteners24hours.txt');
 		$peakhours=ceil($peaktime/(60*60));
 
-		echo '<br/>Auditeurs<br/> '.$listeners.' / Max :  '.htmlspecialchars(file_get_contents('./d/maxlisteners.txt')).' (depuis toujours) '.htmlspecialchars(file_get_contents('./d/maxlisteners24hours.txt')).' (depuis '.htmlspecialchars($peakhours).' heures)';
+		echo '<br/>Auditeurs : '.$listeners.' / Max :  '.htmlspecialchars(file_get_contents('./d/maxlisteners.txt')).' (depuis toujours) '.htmlspecialchars(file_get_contents('./d/maxlisteners24hours.txt')).' (depuis '.htmlspecialchars($peakhours).' heures)';
 	}
 	else if ($_GET['ajax']==='cover'){
 		$covers=trim(file_get_contents('../d/covers.txt'));
@@ -253,6 +262,11 @@ function loginpanel($activateaccountcreation){
 		
 	}
 	?>
+	
+	
+	
+	
+	
 <a name="menu"></a><div id="mainmenu" style="display:block;">	
 	<span style=""><img style="float:left;width:3%;" src="/favicon.png"/></span>
 		
@@ -301,7 +315,23 @@ function refreshCover(){
 window.setInterval(refreshBlock, 2000);
 window.setInterval(refreshCover, 30000);
 setTimeout (refreshCover, 3000);
-</script>
+</script><?php
+$menuitems = array_keys($mainmenu);
+
+foreach ($menuitems as $menuitem)
+{
+	$title = $menuitem ;
+	
+	$target = $mainmenu[$menuitem];
+	
+	echo '<a href="'.$target.'" class="mainmenubutton" onclick="this.style.border='."'solid red 2px;'".'" ';
+	if (basename($target)==$olddir){
+		echo 'style="border:solid yellow 2px;"';
+		}
+	echo '>'.htmlspecialchars($title).'</a>';
+	
+}?>
+<br style="clear:both;"/>
 Stream : <a href="?m3u=m3u">m3u</a> <a href="./stream.mp3">mp3</a><br/>
 
 <img style="float:left;width:25%;" id="cover"/>
@@ -395,9 +425,10 @@ if ($activatestats){
   xhttp.send();
 
 </script>
-
+<hr style="clear:both;"/>
 <?php
 }
+echo $footerhtmlcode;
 ?>
 </body>
 </html>

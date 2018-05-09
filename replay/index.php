@@ -700,7 +700,7 @@ if ($hasradio){
 <noscript>Your browser does not support Javascript, which is required on this website if you want to stream. Don't panic, we dont include any kind of third party scripts<br/></noscript>
 <div style="text-align:center;"><a href="#" onclick="document.getElementById('recentplay').style.display='block';"></a></div>
 <span id="recentplay" style="display:<?php
-if ($recentplay){
+if ($recentplay&&false){
 	echo 'block';
 	
 }
@@ -772,7 +772,7 @@ else if (isset ($_GET['artist'])) {
 		}
 
 		sort($artists);
-		echo '<span style="margin-top:4px;marging-bottom:4px;"><a style="float:left;padding:2px;" href="./">Artists : </a> ';
+		echo '<span style="margin-top:4px;marging-bottom:4px;"><a style="float:left;padding:2px;" href="./">Animateurs : </a> ';
 
 		foreach ($artists as $artist) {
 			echo '<a style="float:left;border:solid 1px;background-color:#A0A0A0;padding:2px;" href="http://'.$server.'/?artist='.urlencode($artist).'"> '.htmlspecialchars($artist).' </a> ';
@@ -791,7 +791,22 @@ else if (isset ($_GET['artist'])) {
 	?>
 
 	</span><br style="clear:both;"/>
+	<?php
+$menuitems = array_keys($mainmenu);
+
+foreach ($menuitems as $menuitem)
+{
+	$title = $menuitem ;
 	
+	$target = $mainmenu[$menuitem];
+	
+	echo '<a href="'.$target.'" class="mainmenubutton" onclick="this.style.border='."'solid red 2px;'".'" ';
+	if (basename($target)=='/replay'){
+		echo 'style="border:solid yellow 2px;"';
+		}
+	echo '>'.htmlspecialchars($title).'</a>';
+	
+}?><br style="clear:both;"/><h1>Replay</h1>
 <?php
 
 if ($mosaic) {
@@ -1855,7 +1870,7 @@ if (!isset ($_GET['album'])&&!isset($_GET['track'])&&!$_SESSION['random']&&$weac
 }
 if (!$weactuallydisplayedsomething){
 	
-	echo 'Yeah ! You reached the bottom... There is nothing older.<br/>';
+	echo '<br/>Aucun autre contenu actuellement disponible.<br/>';
 	
 	
 }
@@ -1937,7 +1952,7 @@ setInterval(function (){
 <?php  
 }
 ?>
-<div style="float:rigth;font-size:76%;">Powered by <a href="http://crero.clewn.org" title="CreRo, the open-source CMS for record labels">CreRo, the CMS for record labels</a> - AGPL licensed - <a href="http://github.com/shangril/crero">code repo</a></div>
+<div style="float:rigth;font-size:76%;">Powered by Mylicora, the CMS for community webradios - AGPL licensed - <a href="http://github.com/shangril/Mylicora">code repo</a></div>
 </body>
 </html><?php
 if ($activatehtmlcache){

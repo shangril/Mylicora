@@ -1,9 +1,9 @@
 <?php
 require_once('./config.php');
-//error_reporting(E_WARNING|E_NOTICE);
+error_reporting(E_WARNING|E_NOTICE);
 
 require_once('./crero-lib.php');
-
+$olddir="/";
 ?><!DOCTYPE html>
 <html>
 <head>
@@ -32,10 +32,8 @@ foreach ($menuitems as $menuitem)
 	
 	$target = $mainmenu[$menuitem];
 	
-	echo '<a href="'.$target.'" class="mainmenubutton" onclick="this.style.border='."'solid red 2px;'".'"
-	
-	';
-	if ($basename($target)==$olddir){
+	echo '<a href="'.$target.'" class="mainmenubutton" onclick="this.style.border='."'solid red 2px;'".'" ';
+	if (basename($target)==$olddir){
 		echo 'style="border:solid yellow 2px;"';
 		}
 	echo '>'.htmlspecialchars($title).'</a>';

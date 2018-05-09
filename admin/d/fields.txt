@@ -56,5 +56,7 @@ streaming_albums_ratio.txt
 The display ratio for streaming only cover arts in mosaic (replay index page) mode. Default is 0.65
 download_albums_magic_number.txt
 Used to compute, in the "replay" section according to album ("season" for a particular show score if stats enabled, the display ratio for downloadable albs cover arts in mosaic (index page) mode. Default is 7550
+mailing-list-owner.txt
+An email adress to which contact requests will be forwarded. Not used by the software currently. 
 user_notes.txt
 Not used by the software. There, you can take notes about your site admin tasks, such as todo list or changelog

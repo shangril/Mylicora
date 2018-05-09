@@ -328,7 +328,7 @@ if (file_exists('./d/mainmenu.txt')){
 	$socdata=trim(file_get_contents('./d/mainmenu.txt'));
 	$soctokens=explode("\n", $socdata);
 	for ($p=0;$p<count($soctokens);$p++){
-		$contentmenu=$soctoken[$p+1];
+		$contentmenu=$soctokens[$p+1];
 		$mainmenu[$soctokens[$p]]=$contentmenu;
 		$p++;
 		}
@@ -348,8 +348,7 @@ $mediatiers=Array();
 if (file_exists('./d/RadioMediaTiers.txt')){
 	$socdata=trim(file_get_contents('./d/RadioMediaTiers.txt'));
 	$soctokens=explode("\n", $socdata);
-	for ($p=0;$p<count($soctokens);$p++){
-		
+		$p=0;
 		while ($p<count($soctokens)){
 			$socialone=Array();
 			$socialone['name']=$soctokens[$p];
@@ -366,14 +365,15 @@ if (file_exists('./d/RadioMediaTiers.txt')){
 			array_push($mediatiers, $socialone);
 			$p++;
 		}
-	}
 }
+
+
+
 $mediatierswhitelists=Array();
 if (file_exists('./d/MediaTiersWhitelist.txt')){
 	$socdata=trim(file_get_contents('./d/MediaTiersWhitelist.txt'));
 	$soctokens=explode("\n", $socdata);
-	for ($p=0;$p<count($soctokens);$p++){
-		
+		$p=0;
 		while ($p<count($soctokens)){
 			$socialone=Array();
 			$socialone['url']=$soctokens[$p];
@@ -389,16 +389,14 @@ if (file_exists('./d/MediaTiersWhitelist.txt')){
 				$p++;
 				}
 			$socialone['whitelist']	= $whitelisted;
-			$mediatiersblacklists[$socialone['url']]=$socialone;
+			$mediatierswhitelists[$socialone['url']]=$socialone;
 		}
-	}
 }
 $mediatiersblacklists=Array();
 if (file_exists('./d/MediaTiersAlbumBlacklist.txt')){
 	$socdata=trim(file_get_contents('./d/MediaTiersAlbumBlacklist.txt'));
 	$soctokens=explode("\n", $socdata);
-	for ($p=0;$p<count($soctokens);$p++){
-		
+		$p=0;
 		while ($p<count($soctokens)){
 			$socialone=Array();
 			$socialone['url']=$soctokens[$p];
@@ -416,6 +414,5 @@ if (file_exists('./d/MediaTiersAlbumBlacklist.txt')){
 			$socialone['blacklist']	= $whitelisted;
 			$mediatiersblacklists[$socialone['url']]=$socialone;
 		}
-	}
 }
 ?>
