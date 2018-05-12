@@ -9,7 +9,7 @@ $statid=mt_rand(0, 1000000);
 if (!$hasradio){
 	die();
 }
-/*if ($autobuildradiobase){
+if ($autobuildradiobase){
 
 	$linez=explode("\n",  file_get_contents($clewnapiurl.'?listfiles=true'));
 	
@@ -19,10 +19,10 @@ if (!$hasradio){
 		$a2.=$clewnaudiourl.$line."\n";
 	}
 	file_put_contents('../../d/radioBase.txt',$a2);
-}*/ // we can do much better without this
+}
 
 
-/*if (!file_exists('../d/featuredapitime.txt')){
+if (!file_exists('../d/featuredapitime.txt')){
 	file_put_contents('../d/featuredapitime.txt', 0);
 }
 if (!file_exists('../d/mediafetch-0.txt')){
@@ -36,11 +36,8 @@ if (!file_exists('../d/mediafetch-1.txt')){
 
 if (!file_exists('../d/baseapitime.txt')){
 	file_put_contents('../d/baseapitime.txt', 0);
-}*/ //all of this is no lnger useful
-if (!file_exists('../d/apitime.dat')){
-	file_put_contents('../d/apitime.dat', 0);
 }
-//no longer used !
+
 
 if ($radiohasyp&&!file_exists('../d/ypexpires.txt')){
 	file_put_contents('../d/ypexpires.txt', '0');
@@ -61,7 +58,7 @@ if (!file_exists('../d/listeners')){
 	
 }
 
-function dothelistenerscount($radioname, $server, $radiodescription, $labelgenres, $radiohasyp, $statid, $duration, $mediatiers, $mediatierswhitelists, $mediatiersblacklists){
+function dothelistenerscount($radioname, $server, $radiodescription, $labelgenres, $radiohasyp, $statid, $duration){
 	$inittime=microtime(true);
 	$listeners=array_diff(scandir('../d/listeners'), Array('..', '.'));
 	foreach ($listeners as $listener){
@@ -228,27 +225,32 @@ $nextartist=$nowplayingartist;
 $nextbitrate=$nowplayingbitrate;
 $nexttitle=$nowplayingtitle;
 
-while (file_exists('../d/lock.txt')&&microtime(true)-floatval(file_get_contents('../d/lock.txt'))>1.01){
+while (file_exists('../d/lock.txt')){
 		
 	$silenttimer=microtime(true);
 
-	//fpassthru('../silence.mp3');
+	fpassthru('../silence.mp3');
 	ob_flush();
 	flush();
-	//usleep (round(1000000*(0.052-(microtime(true)-$silenttimer))));
+	usleep (round(1000000*(0.052-(microtime(true)-$silenttimer))));
 
 }
 
-if (microtime(true)>=$expire&&(microtime(true)-floatval(file_get_contents('../d/lock.txt'))>1.01)){
-		
-	$nextartist='';
+if (microtime(true)>=$expire&&(!file_exists('../d/lock.txt'))){
 	
+	$nexturl='';
+	$nextduration=0;
+	$nextalbum='';
+	$nextartist='';
+	$nextbitrate=0;
+	$nexttitle='';
+
 		if (strlen($nextartist)===0){
 		
 		
 		file_put_contents('../d/lock.txt', microtime(true));
 		$apitimestart=microtime(true);
-		
+		$featuredapi=false;
 		
 		
 		
@@ -271,112 +273,128 @@ if (microtime(true)>=$expire&&(microtime(true)-floatval(file_get_contents('../d/
 		if (!$isthislistenercounted){
 			file_put_contents('../d/listeners/'.microtime(true), $statid);
 		}
+//****************** DICES DICES DICES *****************************************
 		
-		//****************** DICES DICES DICES *****************************************
 		
-		$targetz = array();
-		
-		foreach ($mediatiers as $mediatier)
-		{
-			
-				for ($i=0;$i<$mediatier['weight'];$i++)
-				{
-			
-					array_push($targetz, $mediatier);
+		$apirequest='';
+	
+		do {
 				
-			
-			}
-				
-			
-		}
-		shuffle ($targetz);
-		
-		$socialone=$targetz[mt_rand(0, count($targetz)-1)];
-		
-		
-		$apiurl = $socialone['url'];
-		$isapidownload = $socialone['download'];
-		$isapiwhitelist = $socialone['whitelist'];
-		$audiourl=$socialone['audio_url'];
-		
-		
-		
-		$hasrun=false;
-		
-		if (!$hasrun){
-		//	$featuredapi=true;
-			if (!$isinitial){
-				$loop=ceil(floatval(file_get_contents('../d/apitime.txt'))/0.052);
-				$silent='';
-				$silentfile=file_get_contents('../silence.mp3');
-				for ($i=0;$i<$loop;$i++){
-					//$silent.=$silentfile;
+			$targetz = array();
 					
+			
+			foreach ($mediatiers as $mediatier)
+			{
+				
+					for ($i=0;$i<$mediatier['weight'];$i++)
+					{
+				
+						array_push($targetz, $mediatier);
+						
 				}
-				//echo $silent;
-				ob_flush();
-				flush();
+					
+				
 			}
-			$whatwehave=Array();
-			//**************QUERY API, FILL M3U LIST, OF WHAT HAS TO BE PLAYED 
-			$a2='';
-				
-			if (!$isapiwhitelist){
-					$linez=explode("\n",  file_get_contents($apiurl.'?listfiles=true'));
-		
+			shuffle ($targetz);
+			
+			$socialone=$targetz[random_int(0, count($targetz)-1)];
+			//var_dump($socialone);
+			
+			$apiurl = $socialone['url'];
+			$isapidownload = $socialone['download'];
+			$isapiwhitelist = $socialone['whitelist'];
+			$audiourl=$socialone['audio_url'];
+			
+			
+			
+			$hasrun=false;
+			
+			//	$featuredapi=true;
+				if (!$isinitial){
 					
-					foreach ($linez as $line){
-						$a2.=$audiourl.urlencode($line)."\n";
+					if (file_exists(('../d/apitime'.str_replace ('/', '.', $apiurl).'.txt')))
+					{
+					
+					$timez=file_get_contents('../d/apitime'.str_replace ('/', '.', $apiurl).'.txt');
 					}
-			}
-			else {
-				
-				$albz=array();
-				
-				foreach ($mediatierswhitelists[$apiurl]['whitelist'] as $art){
-				
-				//first, query for a list of album by this particular artist
-						$albz = array_merge_recursive($albz, explode("\n", file_get_contents($apiurl.'?listalbums='.urlencode(htmlentities($art)))));
-					
+					else
+					{
+					$timez=0;
 					}
-				//then, remove the blacklisted albums if any
-					if (isset($mediatiersblacklists[$apiurl]['blacklist'])){
-					$blacklist=$mediatiersblacklists[$apiurl]['blacklist'];
+					$loop=ceil(floatval($timez)/0.052);
+					$silent='';
+					$silentfile=file_get_contents('../silence.mp3');
+					for ($i=0;$i<$loop;$i++){
+						$silent.=$silentfile;
+						
 					}
-					else{
-					$blacklist=array();
-					}
+					echo $silent;
+					ob_flush();
+					flush();
+				}
+				$whatwehave=Array();
+				//**************QUERY API, FILL M3U LIST, OF WHAT HAS TO BE PLAYED 
+				$a2='';
+					
+				if (!$isapiwhitelist){
+						$linez=explode("\n",  file_get_contents($apiurl.'?listfiles=true'));
+			
+						
+						foreach ($linez as $line){
+							$a2.=$audiourl.urlencode($line)."\n";
+						}
+				}
+				else {
+					
+					$albz=array();
+					
+					foreach ($mediatierswhitelists[$apiurl]['whitelist'] as $art){
+					
+					//first, query for a list of album by this particular artist
+							$albz = array_merge_recursive($albz, explode("\n", file_get_contents($apiurl.'?listalbums='.urlencode(htmlentities($art)))));
+						
+						}
+					//then, remove the blacklisted albums if any
+						if (isset($mediatiersblacklists[$apiurl]['blacklist'])){
+						$blacklist=$mediatiersblacklists[$apiurl]['blacklist'];
+						}
+						else{
+						$blacklist=array();
+						}
+						
+						
+						
+						$finalz=array_diff($albz, $blacklist);
 					
 					
 					
-					$finalz=array_diff($albz, $blacklist);
-				
-				
-				
-				//then, for each album, query the api for the list of tracks
-					foreach ($finalz as $queryme){
-						$linez=explode("\n",  file_get_contents($apiurl.'?gettracks='.$queryme));
-		
-					
-							foreach ($linez as $line){
-								if ($line!==''){//safer with API not always responding right
-								$a2.=$audiourl.urlencode($line).'.mp3'."\n";
+					//then, for each album, query the api for the list of tracks
+						foreach ($finalz as $queryme){
+							$linez=explode("\n",  file_get_contents($apiurl.'?gettracks='.$queryme));
+			
+						
+								foreach ($linez as $line){
+									if ($line!==''){//safer with API not always responding right
+									$a2.=$audiourl.urlencode($line).'.mp3'."\n";
+									}
 								}
-							}
+						}
 					}
-				}
-			$featured=explode("\n",$a2);
-			shuffle($featured);
-			$thisfeatured = $featured[mt_rand(0, count($featured) - 1)];
+				$featured=explode("\n",$a2);
+				shuffle($featured);
+				$thisfeatured = $featured[random_int(0, count($featured) - 1)];
+				
+				/******/
+					
+				$featuredbasenamed=explode('/', $thisfeatured);
+				$featuredbasename=array_pop($featuredbasenamed);
+				
+				
+				$apirequest=file_get_contents($apiurl.'?radio='.$featuredbasename);
 			
-			/******/
-
-			$featuredbasenamed=explode('/', $thisfeatured);
-			$featuredbasename=array_pop($featuredbasenamed);
-		
-
-			$apirequest=file_get_contents($apiurl.'?radio='.urlencode($featuredbasename));
-			if (strlen($apirequest)>0){
+				
+				
+				
 				$result=explode("\n", $apirequest);
 				
 				$nexturl=$thisfeatured;
@@ -402,54 +420,11 @@ if (microtime(true)>=$expire&&(microtime(true)-floatval(file_get_contents('../d/
 				file_put_contents('../d/starttime.txt', microtime(true));
 			
 		
-				}
-		}
-		/*else {
-			
-			if (!$isinitial){
-				$loop=ceil(floatval(file_get_contents('../d/baseapitime.txt'))/0.052);
-				$silent='';
-				$silentfile=file_get_contents('../silence.mp3');
-				for ($i=0;$i<$loop;$i++){
-					$silent.=$silentfile;
-					
-				}
-				echo $silent;
-				ob_flush();
-				flush();
 			}
+		while (strlen($apirequest)<=0);
 			
-			$featured=explode("\n", $radiobase);
-			shuffle($featured);
-			$thisfeatured = $featured[mt_rand(0, count($featured) - 1)];
-			
-			$featuredbasenamed=explode('/', $thisfeatured);
-			$featuredbasename=array_pop($featuredbasenamed);
-			
-			$apihook=str_replace($featuredbasename, '', $thisfeatured);
-			$apihook=str_replace('/audio/', '/api.php', $apihook);
-			$apihook=str_replace('/z/', '/api.php', $apihook);
-			
-			$apibase=$apihook;
-			
-			$apihook.='?radio='.urlencode($featuredbasename);
-			$apirequest=file_get_contents($apihook);
-			$result=explode("\n", $apirequest);
-			
-			$nexturl=$thisfeatured;
-			$nextartist=$result[0];
-			$nextalbum=$result[1];
-			$nexttitle=$result[2];
-			$nextduration=$result[3];
-			$nextbitrate=$result[4];
-			
-			file_put_contents('../d/license.txt', file_get_contents($apibase.'?getinfo='.urlencode(str_replace('.mp3', '', $featuredbasename))));
-			
-			
-			file_put_contents('../d/nowplayingisfeatured.txt', '1');
-			file_put_contents('../d/starttime.txt', microtime(true));
-			}*/
-		}
+		
+	
 $nowplayingduration=$nextduration;
 
 file_put_contents('../d/nowplayingduration.txt', $nowplayingduration);
@@ -467,6 +442,9 @@ $nowplayingbitrate=$nextbitrate;
 file_put_contents('../d/nowplayingbitrate.txt',$nowplayingbitrate);
 
 unlink('../d/lock.txt');
+	}
+
+}
 /*
 if(false&&(!isset($nowplayingartist) || trim($nowplayingartist)==='')&&$autodeleteuntagguedtracks){
 			$basename=array_reverse(explode('/', $nowplayingurl))[0];
@@ -524,13 +502,11 @@ if(false&&(!isset($nowplayingartist) || trim($nowplayingartist)==='')&&$autodele
 			if ($save){
 				file_put_contents('../d/ypexpires.txt', microtime(true)+floatval(file_get_contents('../d/ypttl.txt')));
 			}
-		}
-
-
-		file_put_contents('../d/apitime.txt', microtime(true)-$apitimestart);
 		
-}
- 
+
+	file_put_contents('../d/apitime'.str_replace('/', '.', $apiurl).'.txt', microtime(true)-$apitimestart);
+
+	}
 	$nowplayingduration=intval(file_get_contents('../d/nowplayingduration.txt'));
 	$nowplayingurl=file_get_contents('../d/nowplayingurl.txt');
 	$nowplayingalbum=file_get_contents('../d/nowplayingalbum.txt');
@@ -643,7 +619,7 @@ if (floatval(microtime(true))<floatval($expire)&&$bytestosend>=1&&$nowplayingurl
 		
 			$silenttimer=microtime(true);
 		
-		//	fpassthru('../silence.mp3');//all I found. Quite hugly
+			fpassthru('../silence.mp3');//all I found. Quite hugly
 			ob_flush();
 			flush();
 		}
@@ -654,7 +630,7 @@ if (floatval(microtime(true))<floatval($expire)&&$bytestosend>=1&&$nowplayingurl
 	}
 	$isinitial=false;
 	if (!isset($_GET['web'])){
-		play($radioname, $server, $radiodescription, $labelgenres, $radiohasyp, $statid, $bytessent, $isinitial, $mediatiers, $mediatierswhitelists, $mediatiersblacklists);
+		play($radioname, $server, $radiodescription, $labelgenres, $radiohasyp, $statid, $bytessent, $isinitial);
 	}
 	else {
 		ob_flush();
